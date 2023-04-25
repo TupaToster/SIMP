@@ -43,7 +43,7 @@ void calcScr (unsigned char* background, unsigned char* buranya,
 
     unsigned int cnt = 0;
     unsigned int overIter = 0;
-    unsigned int backIter = y0 * backSizeY + x0;
+    unsigned int backIter = y0 * backSizeX + x0;
 
     for (;;) {
 
