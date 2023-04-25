@@ -8,12 +8,13 @@
 #include <chrono>
 #include <assert.h>
 
-#define backgroundName "TableResize.bmp"
+#define backgroundName "backgrnd.bmp"
 #define buranyaName "buranya.bmp"
+// #define buranyaName "buranya_transparent.bmp"
 
 const int topCalcLimit = 100; //highest amount of calculations per point
 
 void calcScr (unsigned char* background, unsigned char* buranya,
-              unsigned int overSizeX, unsigned int overSizeY,
-              unsigned int backSizeX, unsigned int backSizeY,
-              const unsigned int x0 = 0, const unsigned int y0 = 0);
+              const unsigned int overSizeX, const unsigned int overSizeY,
+              const unsigned int backSizeX, const unsigned int backSizeY,
+              const unsigned int x0, const unsigned int y0);

@@ -41,7 +41,7 @@ int main () {
 
         clock_t time = clock ();    // gets initial time
 
-        calcScr (background, overlay, overSizeX, overSizeY, backSizeX, backSizeY, 100, 100);
+        calcScr (background, overlay, overSizeX, overSizeY, backSizeX, backSizeY, 640, 190);
 
         time = (clock () - time) * 1000 / CLOCKS_PER_SEC; // measures work time
 
@@ -51,7 +51,7 @@ int main () {
 
         sf::Sprite sprite (pixlArr);    // creates sprite (хз зачем но так в примере сфмла написано)
 
-        window.clear ();
+        // window.clear ();
         window.draw (sprite);   // draws to window
         window.display ();  // displays it
 

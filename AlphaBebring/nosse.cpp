@@ -14,7 +14,7 @@ void calcScr (unsigned char* background, unsigned char* buranya,
             background[backIter    ] = (buranya[overIter    ] * buranya[overIter + 3] + background[backIter    ] * (255 - buranya[overIter + 3])) >> 8;
             background[backIter + 1] = (buranya[overIter + 1] * buranya[overIter + 3] + background[backIter + 1] * (255 - buranya[overIter + 3])) >> 8;
             background[backIter + 2] = (buranya[overIter + 2] * buranya[overIter + 3] + background[backIter + 2] * (255 - buranya[overIter + 3])) >> 8;
-            // background[backIter + 3] = 255;
+            background[backIter + 3] = (buranya[overIter + 3] * buranya[overIter + 3] + background[backIter + 3] * (255 - buranya[overIter + 3])) >> 8;
         }
     }
 }
