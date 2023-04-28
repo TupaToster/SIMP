@@ -1,28 +1,26 @@
 #include "head.h"
 
-
-
 /// @brief Calculates whole screens specs and writes to rgba array
 /// @param rgba array of pixels in rgbquad format
 void calcScr (unsigned char* rgba) {
 
-    float y = YLIMH;
-    float x = XLIML;
-    float x00 = x;
-    float shift = (XLIMH - XLIML) / ScrSize;
+    volatile float x = XLIML;   // initial x
+    volatile float y = YLIMH;   // initial y
+    float x00 = x;  // initial x save
+    float shift = (XLIMH - XLIML) / ScrSize; // width of a pixel
 
-    int cnt = 0;
+    int cnt = 0;    // counts how many pixels were processed
     for (int scrIter = 0; scrIter < ScrSize * ScrSize * 4; scrIter+=4) {
 
         if (cnt == ScrSize) {
 
             x = x00;
-            y -= shift;
+            y -= shift;     // sets x and y for a new line of pixels
             cnt = 0;
         }
 
         // x = XLIML + float((scrIter / 4) % ScrSize) / ScrSize * (XLIMH - XLIML);
-        // y = YLIMH - float(scrIter / (ScrSize * 4)) / ScrSize * (YLIMH - YLIML);
+        // y = YLIMH - float(scrIter / (ScrSize * 4)) / ScrSize * (YLIMH - YLIML);      // obsolete methods that calculated each pixels location independently
 
 
         float x_0 = x;  // saves initial pos
@@ -41,7 +39,7 @@ void calcScr (unsigned char* rgba) {
         }
 
         x = x_0 + shift;
-        y = y_0;
+        y = y_0;        // switches to the next pixel
         cnt++;
 
         if (i == topCalcLimit) i = 0; // sets to default color if maxxed out the calculation limit

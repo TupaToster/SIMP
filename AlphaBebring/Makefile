@@ -1,11 +1,11 @@
 CC=g++
 OBJ_ARGS=-lsfml-graphics -lsfml-window -lsfml-system
-CC_ARGS=-I /usr/include/SFML
 CC_SRCS=main.cpp
 NOSSE_SRC=nosse.cpp
 AVX_SRC=avx.cpp
 OBJDIR=obj/
 DEPDIR=dep/
+CC_ARGS=-I /usr/include/SFML -O3
 
 all: $(OBJDIR) $(DEPDIR) nosse avx
 

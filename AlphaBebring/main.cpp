@@ -2,56 +2,60 @@
 
 int main () {
 
-    sf::Image backgroundImg, buranyaImg;
+    sf::Image backgroundImg, buranyaImg;    // creates image classes from SFML for overlay and background
 
     if (!backgroundImg.loadFromFile (backgroundName)) {
 
         printf ("Error occured during background image loading\n");
-        return 0;
-    }
+        return -1;
+    } // checks for error during loading background
 
     if (!buranyaImg.loadFromFile (buranyaName)) {
 
         printf ("Error occured during loading of buranya\n");
-        return 0;
-    }
+        return -1;
+    } // checks for error during loading overlay
 
-    unsigned int backSizeX = backgroundImg.getSize ().x;
-    unsigned int backSizeY = backgroundImg.getSize ().y;
-    unsigned int overSizeX = buranyaImg.getSize ().x;
-    unsigned int overSizeY = buranyaImg.getSize ().y;
+    unsigned int backSizeX = backgroundImg.getSize ().x; // Retrieves x and y size of background
+    unsigned int backSizeY = backgroundImg.getSize ().y; // Retrieves x and y size of background
 
-    unsigned char* background = (unsigned char*) calloc (backSizeX * backSizeY * 4, sizeof (unsigned char));
+    unsigned int overSizeX = buranyaImg.getSize ().x;    // Retrieves x and y size of overlay
+    unsigned int overSizeY = buranyaImg.getSize ().y;    // Retrieves x and y size of overlay
+
+    unsigned char* background = (unsigned char*) calloc (backSizeX * backSizeY * 4, sizeof (unsigned char)); // creates a copy array that will be changed by function and displayed
     assert (background != NULL);
-    memcpy (background, (unsigned char*) backgroundImg.getPixelsPtr (), backSizeX * backSizeY * 4);
 
-    unsigned char* overlay = (unsigned char*) calloc (overSizeX * overSizeY * 4, sizeof (unsigned char));
+    unsigned char* overlay = (unsigned char*) calloc (overSizeX * overSizeY * 4, sizeof (unsigned char)); // creates a copy array that will be changed by function and displayed
     assert (overlay != NULL);
-    memcpy (overlay, (unsigned char*) buranyaImg.getPixelsPtr (), overSizeX * overSizeY * 4);
 
     sf::RenderWindow window (sf::VideoMode (backgroundImg.getSize ().x, backgroundImg.getSize ().y), "alphabebring");
+    // creates a window of size of background
 
     sf::Texture pixlArr;    // creates a texture
-    pixlArr.create (backSizeX, backSizeY); // sets its dimensions to XSIZE * YSIZE
+    pixlArr.create (backSizeX, backSizeY); // sets its dimensions to dimensions of background
 
+    int time[expCountLimit > 0 ? expCountLimit : 1] = {0};
+    int i = 0;
     while (window.isOpen ()) {
 
-        memcpy (background, (unsigned char*) backgroundImg.getPixelsPtr (), backSizeX * backSizeY * 4);
-        memcpy (overlay, (unsigned char*) buranyaImg.getPixelsPtr (), overSizeX * overSizeY * 4);
+        if (expCountLimit != 0 and i >= expCountLimit) break;
 
-        clock_t time = clock ();    // gets initial time
+        memcpy (background, (unsigned char*) backgroundImg.getPixelsPtr (), backSizeX * backSizeY * 4); // copies image to proxy array
+        memcpy (overlay, (unsigned char*) buranyaImg.getPixelsPtr (), overSizeX * overSizeY * 4); // -//-
 
-        calcScr (background, overlay, overSizeX, overSizeY, backSizeX, backSizeY, 640, 190);
+        time[i] = clock ();    // gets initial time
 
-        time = (clock () - time) * 1000 / CLOCKS_PER_SEC; // measures work time
+        calcScr (background, overlay, overSizeX, overSizeY, backSizeX, backSizeY, x0, y0);
 
-        printf ("%ld\n", time);
+        time[i] = (clock () - time[i]) * 1000 / CLOCKS_PER_SEC; // measures work cpu time in msec
+
+        printf ("%ld\n", time[i]); // prints result
+        i = expCountLimit > 0 ? i + 1 : 0;
 
         pixlArr.update (background);      // updates texture with rgbquad array
 
         sf::Sprite sprite (pixlArr);    // creates sprite (хз зачем но так в примере сфмла написано)
 
-        // window.clear ();
         window.draw (sprite);   // draws to window
         window.display ();  // displays it
 
@@ -62,5 +66,21 @@ int main () {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+    }
+
+    window.close ();
+
+    if (expCountLimit == 0) return 0;
+
+    for (int i = 1; i <= expCountLimit; i++) {  // Calculates and prints avg time over expCountLimit runs
+
+        if (i == expCountLimit or time[i] == 0) {
+
+            double res = (double) time[0];
+            res /= (double) i;
+            printf ("Resulting avg time across %d runs is : %lg\n", i, res);
+            break;
+        }
+        time[0] += time[i];
     }
 }

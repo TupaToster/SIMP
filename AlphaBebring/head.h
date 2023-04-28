@@ -8,11 +8,14 @@
 #include <chrono>
 #include <assert.h>
 
-#define backgroundName "backgrnd.bmp"
-#define buranyaName "buranya.bmp"
-// #define buranyaName "buranya_transparent.bmp"
+#define backgroundName "backgrnd.bmp" // File names for pictures
+#define buranyaName "buranya.bmp" //
 
-const int topCalcLimit = 100; //highest amount of calculations per point
+const int topCalcLimit = 1000; //amount of calculations per point
+const unsigned int expCountLimit = 100; // total amount of program runs
+const unsigned int x0 = 690; // initial pos of top left corner of overlay (pls check if overlay fits on background)
+const unsigned int y0 = 500; // initial pos of top left corner of overlay (pls check if overlay fits on background)
+
 
 void calcScr (unsigned char* background, unsigned char* buranya,
               const unsigned int overSizeX, const unsigned int overSizeY,

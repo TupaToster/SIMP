@@ -7,7 +7,7 @@ void calcScr (unsigned char* rgbaArray) {
     const __m256 maxDistSq256 = _mm256_set1_ps (maxDistSq);   // max dist vector
     const float oneShift = (XLIMH - XLIML) / ScrSize;
     const __m256 shift = _mm256_set1_ps (8 * oneShift);  // delta for each iteration of pixels
-    __m256 x = _mm256_set_ps (XLIML + 7.0 * oneShift,
+    volatile __m256 x = _mm256_set_ps (XLIML + 7.0 * oneShift,
                               XLIML + 6.0 * oneShift,
                               XLIML + 5.0 * oneShift,
                               XLIML + 4.0 * oneShift,
@@ -15,7 +15,7 @@ void calcScr (unsigned char* rgbaArray) {
                               XLIML + 2.0 * oneShift,
                               XLIML + 1.0 * oneShift,
                               XLIML + 0.0 * oneShift); //x initial
-    __m256 y = _mm256_set1_ps (YLIMH);
+    volatile __m256 y = _mm256_set1_ps (YLIMH);
     __m256 x00 = x; //saving initial x
 
     int cnt = 0;
@@ -30,7 +30,7 @@ void calcScr (unsigned char* rgbaArray) {
         __m256 x0 = x;  // saves start coords
         __m256 y0 = y;  // saves start coords
 
-        __m256i iRes = _mm256_setzero_si256 ();
+        volatile __m256i iRes = _mm256_setzero_si256 ();
 
         for (int i = 0 ; i < topCalcLimit; i++) {
 
@@ -59,7 +59,7 @@ void calcScr (unsigned char* rgbaArray) {
         iRes = _mm256_and_si256 (iRes, _mm256_xor_si256 (_mm256_set1_epi8 (0xFF), _mm256_cmpeq_epi32 (iRes, _mm256_set1_epi32 (topCalcLimit)))); //sets iRes[i] = 0 if iRes[i] == topCalcLimit
 
         int iResInt[8] = {0};
-        _mm256_maskstore_epi32 (iResInt, _mm256_set1_epi8 (0xFF), iRes);
+        _mm256_maskstore_epi32 ( (int*) iResInt, _mm256_set1_epi8 (0xFF), iRes);    // this part was not optimized because it would be very painful to do, and would do next to no effect on performance (unless topCalcLimit is set to around 10 or lower)
 
         for (int i = 0; i < 8; i++) {
 
@@ -67,7 +67,6 @@ void calcScr (unsigned char* rgbaArray) {
             rgbaArray[scrIter + 4 * i + 1] = g0 + (iResInt[i] * (g1 - g0) / topCalcLimit);  // Formats i into color with alpha
             rgbaArray[scrIter + 4 * i + 2] = b0 + (iResInt[i] * (b1 - b0) / topCalcLimit);  // Formats i into color with alpha
             rgbaArray[scrIter + 4 * i + 3] = a0 + (iResInt[i] * (a1 - a0) / topCalcLimit);  // Formats i into color with alpha
-
         }
     }
 }
