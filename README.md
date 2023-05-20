@@ -20,15 +20,15 @@
 
 ### Без AVX оптимизации
 
-В данном разделе исследуется версия программы без SIMD инструкций. В таблице ниже приведены времена исполнения программы, взятые как среднее за 100 её запусков.
+В данном разделе исследуется версия программы без SIMD инструкций. В таблице ниже приведены времена исполнения программы в тактах процессора, взятые как среднее за 100 её запусков.
 
-| Метод компиляции | Время исполнения, мс | Коеффициент ускорения |
+| Метод компиляции | Количество тактов исполнения | Коеффициент ускорения |
 |---|---|---|
-| Без флагов | 220 | 0.75 |
-| С флагом -O3 | 165 | 1.00 |
-| С флагом -Ofast | 159 | 1.04 |
+| Без флагов | 214913.16 | 0.695 |
+| С флагом -O3 | 149449.47 | 1.000 |
+| С флагом -Ofast | 148968.02 | 1.004 |
 
-Как мы видим, компиляция с флагами -O3 и -Ofast дает программы практически совпадающие по скорости работы. Также видно, что флаги ускоряют программу примерно в 1.5 раза. Версия программы, используемая в этом тесте приведена ниже.
+Как мы видим, компиляция с флагами -O3 и -Ofast дает программы практически совпадающие по скорости работы. Также видно, что флаги ускоряют программу примерно в 1.4-1.5 раза. Версия программы, используемая в этом тесте приведена ниже.
 
 ```c++
 
@@ -87,17 +87,21 @@ void calcScr (unsigned char* rgba) {
 
 Тестирующий код приведен в приложении 1 данной работы.
 
-# С AVX оптимизациями
+# С AVX оптимизациями + Вывод
 
-Данная версия программы была переписана с использованием AVX1 и AVX2 инструкций для 256 битных векторов. По счастливой случайности размеры окна (1000х1000) делятся на 8. Способ вычисления для случая, когда измерения изображения не кратны 8, приведен в программе Альфа-блендинга. В таблице ниже приведены времена исполнения программы, взятые как среднее за 100 её запусков.
+Данная версия программы была переписана с использованием AVX1 и AVX2 инструкций для 256 битных векторов. По счастливой случайности размеры окна (1000х1000) делятся на 8. Способ вычисления для случаев, когда измерения изображения не кратны 8, приведен в программе Альфа-блендинга. В таблице ниже приведены времена исполнения программы в тактах, взятые как среднее за 100 её запусков.
 
-| Метод компиляции | Время исполнения, мс | Коеффициент ускорения |
+| Метод компиляции | Количество тактов исполнения | Коеффициент ускорения |
 |---|---|---|
-| Без флагов | 143 | 1.15 |
-| С флагом -O3 | 35 | 4.71 |
-| С флагом -Ofast | 33 | 5.00|
+| Без флагов | 125535.53 | 1.191 |
+| С флагом -O3 | 32514.91 | 4.598 |
+| С флагом -Ofast | 29413.53 | 5.083|
 
-При компиляции без флагов можно наблюдать увеличение скорости практически в два раза по сравнению с компиляцие без флагов и AVX. Но с флагами -O3 и -Ofast наблюдается ускорение в целых 5 раз по сравнению с эталонным временем работы (-O3 без AVX). Разница времени работы между компиляцией без флагов и с флагами также возросла (около 4 раз против 1.5 без AVX). Это может указывать на то, что оптимизатор более приспособлен для программ с SIMD инструкциями.
+По данным, полученным в эксперименте, можно сделать следующие выводы
+
+1) Простое включение флагов дает больший прирост производительности чем переписывание на SIMD инструкции без флагов. Вывод: переписывать на SIMD инструкции и не использовать флаги бессмыслено.
+2) Программа с SIMD инструкциями и флагами оптимизации ускоряется по сравнению с компиляцией -O3 приблизительно в 4 раза, а по сравнению с компиляцией без флагов вообще в 7.3 раза. Вывод: правильное использование SIMD-а дает ускорение практически на порядок, что делает эту оптимизацию одной из первых в задаче оптимизации задач схожих с этой. Конечно же после флагов оптимизации.
+
 
 Версия программы, использованная в этом тесте приведена ниже.
 
@@ -176,10 +180,6 @@ void calcScr (unsigned char* rgbaArray) {
 
 ```
 
-# Вывод
-
-По данным, полученным в эксперименте можно заключить, что оптимизация с AVX инструкциями дает слегка большее ускорение чем просто включение флагов -O3 или -Ofast. В свою очередь AVX-оптимизация программы вместе с флагами дает очень заметный прирост производительности. Поэтому компиляция с флагами и AVX-оптимизация хороши отдельно, но вместе ещё лучше.
-
 ## Альфа блендинг
 
 Данная программа накладывает изображение кота на изображение высадки астронавтов на луну. Для большей ясности результатов вычисление каждой точки производилось 1000 раз. Пример изображения, получающегося в результате запуска программы:
@@ -190,15 +190,15 @@ void calcScr (unsigned char* rgbaArray) {
 
 В данном разделе исследуется версия программы без SIMD инструкций. Данные времени работы, усредненные по 100 запускам приведены ниже.
 
-| Метод компиляции | Время исполнения, мс | Коеффициент ускорения |
+| Метод компиляции | Количество тактов исполнения | Коеффициент ускорения |
 |---|---|---|
-| Без флагов | 224.16 | 1.584 |
-| С флагом -O3 | 141.53 | 1 |
-| С флагом -Ofast | 139.84 | 0.988 |
+| Без флагов | 238629.04 | 0.554 |
+| С флагом -O3 | 132191.60 | 1.000 |
+| С флагом -Ofast | 132767.19 | 0.996 |
 
-Результаты очень схожи с результатами из прошлого раздела. Почти так же, версия без флагов получается примерно в 1.6 раза медленне чем эталон, а -Ofast очень слабо отличается от -O3 в лучшую сторону.
+Результаты отдаленно напоминают картину из прошлого эксперимента: флаг -О3 ускоряет почти в 2 раза; -Ofast не сильно отличается по ускорению от -O3. Но в этом эксперименте -Ofast отличается в худшую сторону, но это смело можно списать на погрешность из-за малой разницы (<1%).
 
-Версия программы, использованная в данном тесте:
+Версия программы, использованная в данном эксперименте:
 
 ```c++
 
@@ -233,17 +233,23 @@ void calcScr (unsigned char* background, unsigned char* buranya,
 
 ```
 
-# C AVX оптимизацией
+# C AVX оптимизацией + Вывод
 
 В данном разделе исследуется скорость работы программы с имплиментрованными SIMD инструкциями. Результаты среднего времени работы программы по 100 запускам представлены в таблице ниже.
 
-| Метод компиляции | Время исполнения, мс | Коеффициент ускорения |
+| Метод компиляции | Количество тактов исполнения | Коеффициент ускорения |
 |---|---|---|
-| Без флагов | 214.68 | 1.517 |
-| С флагом -O3 | 29.44 | 0.208 |
-| С флагом -Ofast | 29.06 | 0.205 |
+| Без флагов | 208702.35 | 0.633 |
+| С флагом -O3 | 2965.47 | 44.577 |
+| С флагом -Ofast | 2939.78 | 44.967 |
 
-В данном тесте мы наблюдаем достаточно интересную картину. Без флагов оптимизации, работа программы практически не ускоряется, что само по себе является странным. Ещё более странным является ускорение программы практически в 5 раз по сравнению с эталоном (-О3 без AVX) при компиляции с флагами оптимизации.
+В данном эксперименте наблюдается картина, абсолютно отличная от того, что было получено для программы по расчету множества Мандельброта.
+1) Мы видим, что прирост производительности без флагов получается сильно меньше чем там (1.14 вместо ~2).
+2) Так же ускорение при использование SIMD-a вместе с флагами преобретает совершенно другой порядок (~45 против 5). А именно улучшение улучшения производительности почти в 9 раз.
+
+Эти результаты подводят к тому, что используемые в этой программе AVX инструкции ещё лучше ускоряются компилятором и дает очень большое уменьшение количества мувов.
+
+В дополнение можно сказать, что эта программа написана исключительно на интринсиках, в то время как в предыдущей программе запись в память велась без SIMD-a. Но маловероятно, что из-за этого ускорение падает в 9 раз.
 
 Код программы использованной в данном тесте:
 
@@ -335,21 +341,17 @@ void calcScr (unsigned char* background, unsigned char* buranya,
 
 ```
 
-# Вывод
-
-В двух тестах было показано, что при отсутствии SIMD инструкций программа ускоряется флагами примерно в полтора раза. Простое Добавление SIMD инструкций практически не ускоряет программу, но добавление к SIMD-у флагов оптимизации ускоряет программу в 7 раз относительно программы без флагов и в 5 раз относительно эталона. Из этих фактов можно сделать вывод, что оптимизация SIMD инструкциями в данном случае хорошо работает только в сочетании с оптимизацией со стороны компилятора.
-
 ## Глобальный вывод
 
-В обоих тестах было доказано, что флаги оптимизации стабильно ускоряют программу в 1.4-1.6 раз. Расчет множества Мандельброта одинаково хорошо ускорился как SIMD инструкциями так и флагами, и ещё лучше их сочетанием. Альфа-блендинг же практически не был ускорен SIMD инструкциями, в отличие от флагов. Но получил должное ускорение при их сочетании. Это могло произойти из-за неправильного написания мною программы в каком-то аспекте, о котором я к сожалению не имею понятия, или из-за большей приспособленности компилятора к оптимизации SIMD инструкций.
+Обе программы показывают, что флаги оптимизации стабильно ускоряют программу в 1.4-1.6 раз. Так же видно, что переписывание программы на интринсики без использования флагов оптимизации есть абсолютно бессмысленное занятие, ведь оно дает ускорение меньше чем просто включение флагов, а требуют много больших усилий. SIMD + -О3 дает хорошее ускорение программы (-Оfast дает резултаты в пределах погрешности от -О3), но порядок ускорения сильно зависит от самой задачи и (скорее всего) от соотношения интринсиков и не-интринсиков. Полученные результаты могут указывать на то, что некоторые SIMD инструкции ускоряются много лучше чем другие, что дает вариацию ускорения в зависимости от задачи.
 
 ### Приложение 1
 
-В данном приложении будет описан метод съема показаний и представлены тестирующие программы с комментариями.
+В данном приложении будет описан метод съема показаний.
 
 ## Общая методика замера времени
 
-В данной работе я решил отказаться от замера кадров в секунду, использованных в схожих работах, а решил замерять процессорное время работы в миллисекундах. Преимущества этого метода заключаются в том, что вывод изображения на экран не вносит никаких ошибок в измерение.
+В данной работе я решил не измерять количество кадров в секунду, а измерять процессорное время работы в тактах. Такое решение было мной принято в силу большей простоты измерения данного параметра и возможности определять какой код измеряется (основной), а какой нет (вспомогательный, например визуализация результатов работы программы).
 
 ## Другие решения использованные в программах тестировки
 
@@ -357,296 +359,4 @@ void calcScr (unsigned char* background, unsigned char* buranya,
 
 Так же имеется заголовочный файл с константами, которые позволяют менять параметры вычисления сразу для всех функций расчета. Это позволяет менять параметры эксперимента максимально централизованно.
 
-## .h + .cpp файлы для множества Мандельброта
-
-```c++
-
-// main.cpp
-
-#include "head.h"
-
-float XLIML = -2.0; // lower x starting lim
-float XLIMH = 0.0; // upper x starting lim
-float YLIML = -1.0; // lower y starting lim
-float YLIMH = 1.0;  // upper y starting lim
-float delta = 0.1; // how much to move per key press (scales when zooming)
-
-#define NO_AFTER_IMAGE
-
-int main () {
-
-    sf::RenderWindow window (sf::VideoMode (ScrSize, ScrSize), "mndlbrt"); // creates a window of ScrSize
-
-    sf::Texture pixlArr;    // creates a texture
-    pixlArr.create (ScrSize, ScrSize); // sets its dimensions to ScrSize * ScrSize
-
-    unsigned char rgbaArray[ScrSize * ScrSize * 4] = {0};    // Array of rgb quads
-
-    int i = 0;  // experiment counter
-    int time[expCountLimit > 0 ? expCountLimit : 1] = {0}; // array for storing times of each exp
-    // if expCountLimit is zero, than an unlimited amount of runs can be performed
-    while (window.isOpen ()) {
-
-        if (expCountLimit != 0 and i == expCountLimit) break;
-
-        time[i] = clock ();    // gets initial time
-
-        calcScr (rgbaArray); // calculates screen for display
-
-        time[i] = (clock () - time[i]) * 1000 / CLOCKS_PER_SEC; // measures cpu time of execution in msec
-
-        printf ("%ld\n", time[i]); // prints time of current calculation
-        i = expCountLimit > 0 ? i + 1 : 0;
-
-        pixlArr.update (rgbaArray);      // updates texture with rgbquad array
-
-        sf::Sprite sprite (pixlArr);    // creates sprite (хз зачем но так в примере сфмла написано)
-
-        #ifdef NO_AFTER_IMAGE       // Here I observed effect of afterimage, that can be explained with me calculating alpha for each pixel, and SFML having built in alpha-blending
-        window.clear ();
-        #endif // if NO_AFTER_IMAGE is defined then the program will clean the screen before displaying new image
-        // This also effects colors, that, if window is not cleared each time, will become brighter over time because of blending with themselves from previous calculations
-        window.draw (sprite);   // draws to window
-        window.display ();  // displays it
-
-
-        // This block lets user interract with image, moving it in all directions and zooming in and out
-        // zooming coef can be changed in head.h
-        if (sf::Keyboard::isKeyPressed (sf::Keyboard::Left)) {
-
-            XLIMH -= delta;
-            XLIML -= delta;
-        }
-        else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Right)) {
-
-            XLIML += delta;
-            XLIMH += delta;
-        }
-        else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Up)) {
-
-            YLIML += delta;
-            YLIMH += delta;
-        }
-        else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Down)) {
-
-            YLIML -= delta;
-            YLIMH -= delta;
-        }
-        else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Equal)) {    // Zoom
-
-            float shift = (XLIMH - XLIML - sigma * (XLIMH - XLIML)) / 2;
-            XLIML += shift;
-            XLIMH -= shift;
-            YLIMH -= shift;
-            YLIML += shift;
-            delta *= sigma;
-        }
-        else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Dash)) {     // UnZoom
-
-            float shift = ((XLIMH - XLIML) / sigma - XLIMH + XLIML) / 2;
-            XLIML -= shift;
-            XLIMH += shift;
-            YLIMH += shift;
-            YLIML -= shift;
-            delta /= sigma;
-        }
-
-        sf::Event event;        // Event var
-
-        while (window.pollEvent(event)) {   // Check for being closed if there is an event (to close the window lol)
-
-            if (event.type == sf::Event::Closed)
-                window.close ();
-        }
-    }
-
-    if (expCountLimit == 0) return 0; // checks if no expCountLimit set, to avoid segfault
-
-    window.close (); // closes the window
-
-    // calculates avg run time across expCountLimit
-    for (int i = 1; i <= expCountLimit; i++) {
-
-        if (i == expCountLimit or time[i] == 0) {
-
-            double res = (double) time[0];
-            res /= (double) i;
-            printf ("Resulting avg time across %d runs is : %lg\n", i, res);
-            break;
-        }
-        time[0] += time[i];
-    }
-}
-
-```
-
-```c++
-
-// head.h
-
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/System.hpp>
-#include <stdio.h>
-#include <stdlib.h>
-#include <immintrin.h>
-#include <chrono>
-
-const unsigned int ScrSize = 1000;  // pixel size of screen (its square)
-const int topCalcLimit = 100; //highest amount of calculations per point
-const float maxDistSq = 100; // max distance squared from center for point calc
-
-const unsigned char r0 = 49; //
-const unsigned char g0 = 56; // zero iter color
-const unsigned char b0 = 54; //
-const unsigned char a0 = 50;//
-
-const unsigned char r1 = 255;//
-const unsigned char g1 = 10; // lim for max iter color (truly max iter color is also zero iter colot (for cool looks))
-const unsigned char b1 = 10; //
-const unsigned char a1 = 255;//
-const unsigned int  expCountLimit = 0; // amount of runs to be performed (0 for unlimited)
-
-const float sigma = 0.8; // coeffitient for zooming/dezooming
-extern float XLIML; // lower x starting lim
-extern float XLIMH; // upper x starting lim
-extern float YLIML; // lower y starting lim
-extern float YLIMH; // upper y starting lim
-extern float delta; // how much to move per key press (scales when zooming)
-
-// uncomment to remove after-image and disable builtin alpha-blending in SFML
-// #define NO_AFTER_IMAGE
-
-void calcScr (unsigned char* rgba);
-
-```
-
-
-## .cpp + .h для Альфа-блендинга
-
-```c++
-
-// main.cpp
-
-#include "head.h"
-
-int main () {
-
-    sf::Image backgroundImg, buranyaImg;    // creates image classes from SFML for overlay and background
-
-    if (!backgroundImg.loadFromFile (backgroundName)) {
-
-        printf ("Error occured during background image loading\n");
-        return -1;
-    } // checks for error during loading background
-
-    if (!buranyaImg.loadFromFile (buranyaName)) {
-
-        printf ("Error occured during loading of buranya\n");
-        return -1;
-    } // checks for error during loading overlay
-
-    unsigned int backSizeX = backgroundImg.getSize ().x; // Retrieves x and y size of background
-    unsigned int backSizeY = backgroundImg.getSize ().y; // Retrieves x and y size of background
-
-    unsigned int overSizeX = buranyaImg.getSize ().x;    // Retrieves x and y size of overlay
-    unsigned int overSizeY = buranyaImg.getSize ().y;    // Retrieves x and y size of overlay
-
-    unsigned char* background = (unsigned char*) calloc (backSizeX * backSizeY * 4, sizeof (unsigned char)); // creates a copy array that will be changed by function and displayed
-    assert (background != NULL);
-
-    unsigned char* overlay = (unsigned char*) calloc (overSizeX * overSizeY * 4, sizeof (unsigned char)); // creates a copy array that will be changed by function and displayed
-    assert (overlay != NULL);
-
-    sf::RenderWindow window (sf::VideoMode (backgroundImg.getSize ().x, backgroundImg.getSize ().y), "alphabebring");
-    // creates a window of size of background
-
-    sf::Texture pixlArr;    // creates a texture
-    pixlArr.create (backSizeX, backSizeY); // sets its dimensions to dimensions of background
-
-    int time[expCountLimit > 0 ? expCountLimit : 1] = {0};
-    int i = 0;
-    while (window.isOpen ()) {
-
-        if (expCountLimit != 0 and i >= expCountLimit) break;
-
-        memcpy (background, (unsigned char*) backgroundImg.getPixelsPtr (), backSizeX * backSizeY * 4); // copies image to proxy array
-        memcpy (overlay, (unsigned char*) buranyaImg.getPixelsPtr (), overSizeX * overSizeY * 4); // -//-
-
-        time[i] = clock ();    // gets initial time
-
-        calcScr (background, overlay, overSizeX, overSizeY, backSizeX, backSizeY, x0, y0);
-
-        time[i] = (clock () - time[i]) * 1000 / CLOCKS_PER_SEC; // measures work cpu time in msec
-
-        printf ("%ld\n", time[i]); // prints result
-        i = expCountLimit > 0 ? i + 1 : 0;
-
-        pixlArr.update (background);      // updates texture with rgbquad array
-
-        sf::Sprite sprite (pixlArr);    // creates sprite (хз зачем но так в примере сфмла написано)
-
-        window.draw (sprite);   // draws to window
-        window.display ();  // displays it
-
-        sf::Event event;        // Event var
-
-        while (window.pollEvent(event)) {   // Check for being closed if there is an event (to close the window lol)
-
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-    }
-
-    window.close ();
-
-    if (expCountLimit == 0) return 0;
-
-    for (int i = 1; i <= expCountLimit; i++) {  // Calculates and prints avg time over expCountLimit runs
-
-        if (i == expCountLimit or time[i] == 0) {
-
-            double res = (double) time[0];
-            res /= (double) i;
-            printf ("Resulting avg time across %d runs is : %lg\n", i, res);
-            break;
-        }
-        time[0] += time[i];
-    }
-}
-
-```
-
-``` c++
-
-// head.h
-
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/System.hpp>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <immintrin.h>
-#include <chrono>
-#include <assert.h>
-
-#define backgroundName "backgrnd.bmp" // File names for pictures
-#define buranyaName "buranya.bmp" //
-
-const int topCalcLimit = 1000; //amount of calculations per point
-const unsigned int expCountLimit = 100; // total amount of program runs
-const unsigned int x0 = 690; // initial pos of top left corner of overlay (pls check if overlay fits on background)
-const unsigned int y0 = 500; // initial pos of top left corner of overlay (pls check if overlay fits on background)
-
-
-void calcScr (unsigned char* background, unsigned char* buranya,
-              const unsigned int overSizeX, const unsigned int overSizeY,
-              const unsigned int backSizeX, const unsigned int backSizeY,
-              const unsigned int x0, const unsigned int y0);
-
-```
-
-### Примечание
-
-Все исходные файлы, мэйкфайлы и изображения могут быть найдены в данном репозитории.
+Так же время работы измерялось при помощи запуска отдельной программы, а не последовательных вызовов одной и той же функции. Это сделано для того, чтобы сделать условия работы программы на каждой итерации максимально приближенными к реальности.

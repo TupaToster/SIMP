@@ -6,7 +6,7 @@ AVX_SRC=avx.cpp
 TEST_SRC=tester.cpp
 OBJDIR=obj/
 DEPDIR=dep/
-CC_ARGS=-I /usr/include/SFML
+CC_ARGS=-I /usr/include/SFML -Ofast
 
 all: $(OBJDIR) $(DEPDIR) nosse avx test
 
