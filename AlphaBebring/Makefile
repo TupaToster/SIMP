@@ -3,11 +3,12 @@ OBJ_ARGS=-lsfml-graphics -lsfml-window -lsfml-system
 CC_SRCS=main.cpp
 NOSSE_SRC=nosse.cpp
 AVX_SRC=avx.cpp
+TEST_SRC=tester.cpp
 OBJDIR=obj/
 DEPDIR=dep/
-CC_ARGS=-I /usr/include/SFML -O3
+CC_ARGS=-I /usr/include/SFML
 
-all: $(OBJDIR) $(DEPDIR) nosse avx
+all: $(OBJDIR) $(DEPDIR) nosse avx test
 
 $(OBJDIR)%.o: %.cpp
 	$(CC) -M $(CC_ARGS) $< -o $(DEPDIR)$(<:.cpp=.d)
@@ -25,6 +26,9 @@ nosse: $(addprefix $(OBJDIR), $(NOSSE_SRC:.cpp=.o) $(CC_SRCS:.cpp=.o))
 avx: $(addprefix $(OBJDIR), $(AVX_SRC:.cpp=.o) $(CC_SRCS:.cpp=.o))
 	$(CC) $^ -o $@ $(OBJ_ARGS) -march=native
 
+test: $(addprefix $(OBJ_DIR), $(TEST_SRC:.cpp=.o))
+	$(CC) $^ -o $@ $(OBJ_DIR)
+
 $(OBJDIR):
 	mkdir $@
 
@@ -32,7 +36,7 @@ $(DEPDIR):
 	mkdir $@
 
 clean:
-	rm -rf *.o *.d nosse avx
+	rm -rf *.o *.d nosse avx test times.txt
 	rm -rf $(DEPDIR) $(OBJDIR)
 	clear
 

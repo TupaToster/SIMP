@@ -4,25 +4,43 @@ float XLIML = -2.0; // lower x starting lim
 float XLIMH = 0.0; // upper x starting lim
 float YLIML = -1.0; // lower y starting lim
 float YLIMH = 1.0;  // upper y starting lim
-float delta = 0.1; // how much to move per key press (scales when zooming)
+float Delta = 0.1; // how much to move per key press (scales when zooming)
 
 #define NO_AFTER_IMAGE
 
-int main () {
+int main (int argc, char* argv[]) {
+
+    unsigned char rgbaArray[ScrSize * ScrSize * 4] = {0};    // Array of rgb quads
+    int time[ExpCountLimit > 0 ? ExpCountLimit : 1] = {0}; // array for storing times of each exp
+
+    if (argc == 2 and strcmp (argv[1], "--test") == 0) {
+
+        FILE* outFile = fopen (GlobalTimeFileName, "ab");
+        assert (outFile != NULL);
+
+        time[0] = clock ();    // gets initial time
+
+        calcScr (rgbaArray); // calculates screen for display
+
+        time[0] = (clock () - time[0]); // measures cpu time of execution in clocks (thats way cool)
+
+        fprintf (outFile, "%d\n", time[0]);
+
+        fclose (outFile);
+
+        return 0;
+    }
 
     sf::RenderWindow window (sf::VideoMode (ScrSize, ScrSize), "mndlbrt"); // creates a window of ScrSize
 
     sf::Texture pixlArr;    // creates a texture
     pixlArr.create (ScrSize, ScrSize); // sets its dimensions to ScrSize * ScrSize
 
-    unsigned char rgbaArray[ScrSize * ScrSize * 4] = {0};    // Array of rgb quads
-
     int i = 0;  // experiment counter
-    int time[expCountLimit > 0 ? expCountLimit : 1] = {0}; // array for storing times of each exp
-    // if expCountLimit is zero, than an unlimited amount of runs can be performed
+    // if ExpCountLimit is zero, than an unlimited amount of runs can be performed
     while (window.isOpen ()) {
 
-        if (expCountLimit != 0 and i == expCountLimit) break;
+        if (ExpCountLimit != 0 and i == ExpCountLimit) break;
 
         time[i] = clock ();    // gets initial time
 
@@ -31,7 +49,7 @@ int main () {
         time[i] = (clock () - time[i]) * 1000 / CLOCKS_PER_SEC; // measures cpu time of execution in msec
 
         printf ("%ld\n", time[i]); // prints time of current calculation
-        i = expCountLimit > 0 ? i + 1 : 0;
+        i = ExpCountLimit > 0 ? i + 1 : 0;
 
         pixlArr.update (rgbaArray);      // updates texture with rgbquad array
 
@@ -49,41 +67,41 @@ int main () {
         // zooming coef can be changed in head.h
         if (sf::Keyboard::isKeyPressed (sf::Keyboard::Left)) {
 
-            XLIMH -= delta;
-            XLIML -= delta;
+            XLIMH -= Delta;
+            XLIML -= Delta;
         }
         else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Right)) {
 
-            XLIML += delta;
-            XLIMH += delta;
+            XLIML += Delta;
+            XLIMH += Delta;
         }
         else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Up)) {
 
-            YLIML += delta;
-            YLIMH += delta;
+            YLIML += Delta;
+            YLIMH += Delta;
         }
         else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Down)) {
 
-            YLIML -= delta;
-            YLIMH -= delta;
+            YLIML -= Delta;
+            YLIMH -= Delta;
         }
         else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Equal)) {    // Zoom
 
-            float shift = (XLIMH - XLIML - sigma * (XLIMH - XLIML)) / 2;
+            float shift = (XLIMH - XLIML - Sigma * (XLIMH - XLIML)) / 2;
             XLIML += shift;
             XLIMH -= shift;
             YLIMH -= shift;
             YLIML += shift;
-            delta *= sigma;
+            Delta *= Sigma;
         }
         else if (sf::Keyboard::isKeyPressed (sf::Keyboard::Dash)) {     // UnZoom
 
-            float shift = ((XLIMH - XLIML) / sigma - XLIMH + XLIML) / 2;
+            float shift = ((XLIMH - XLIML) / Sigma - XLIMH + XLIML) / 2;
             XLIML -= shift;
             XLIMH += shift;
             YLIMH += shift;
             YLIML -= shift;
-            delta /= sigma;
+            Delta /= Sigma;
         }
 
         sf::Event event;        // Event var
@@ -95,14 +113,14 @@ int main () {
         }
     }
 
-    if (expCountLimit == 0) return 0; // checks if no expCountLimit set, to avoid segfault
+    if (ExpCountLimit == 0) return 0; // checks if no ExpCountLimit set, to avoid segfault
 
     window.close (); // closes the window
 
-    // calculates avg run time across expCountLimit
-    for (int i = 1; i <= expCountLimit; i++) {
+    // calculates avg run time across ExpCountLimit
+    for (int i = 1; i <= ExpCountLimit; i++) {
 
-        if (i == expCountLimit or time[i] == 0) {
+        if (i == ExpCountLimit or time[i] == 0) {
 
             double res = (double) time[0];
             res /= (double) i;

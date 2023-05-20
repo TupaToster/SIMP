@@ -63,10 +63,10 @@ void calcScr (unsigned char* rgbaArray) {
 
         for (int i = 0; i < 8; i++) {
 
-            rgbaArray[scrIter + 4 * i + 0] = r0 + (iResInt[i] * (r1 - r0) / topCalcLimit);  // Formats i into color with alpha
-            rgbaArray[scrIter + 4 * i + 1] = g0 + (iResInt[i] * (g1 - g0) / topCalcLimit);  // Formats i into color with alpha
-            rgbaArray[scrIter + 4 * i + 2] = b0 + (iResInt[i] * (b1 - b0) / topCalcLimit);  // Formats i into color with alpha
-            rgbaArray[scrIter + 4 * i + 3] = a0 + (iResInt[i] * (a1 - a0) / topCalcLimit);  // Formats i into color with alpha
+            rgbaArray[scrIter + 4 * i + 0] = R0 + (iResInt[i] * (R1 - R0) / topCalcLimit);  // Formats i into color with alpha
+            rgbaArray[scrIter + 4 * i + 1] = G0 + (iResInt[i] * (G1 - G0) / topCalcLimit);  // Formats i into color with alpha
+            rgbaArray[scrIter + 4 * i + 2] = B0 + (iResInt[i] * (B1 - B0) / topCalcLimit);  // Formats i into color with alpha
+            rgbaArray[scrIter + 4 * i + 3] = A0 + (iResInt[i] * (A1 - A0) / topCalcLimit);  // Formats i into color with alpha
         }
     }
 }
